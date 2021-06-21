@@ -17,16 +17,16 @@ namespace MAD.XamarinForms.ListView.InfiniteScroll
 
             this.listView = bindable;      
             
-            bindable.Scrolled += this.Bindable_Scrolled;
+            bindable.ItemAppearing += this.Bindable_ItemAppearing;
         }
 
         protected override void OnDetachingFrom(XListView bindable)
         {
             base.OnDetachingFrom(bindable);
-            bindable.Scrolled -= this.Bindable_Scrolled;
+            bindable.ItemAppearing -= this.Bindable_ItemAppearing;
         }
 
-        private async void Bindable_Scrolled(object sender, ScrolledEventArgs e)
+        private async void Bindable_ItemAppearing(object sender, ItemVisibilityEventArgs e)
         {
             if (this.isLoading)
             {
@@ -39,11 +39,10 @@ namespace MAD.XamarinForms.ListView.InfiniteScroll
                 return;
 
             var itemsSource = this.listView.ItemsSource as IEnumerable<object>;
-            var itemsSourceCount = itemsSource.Count();
+            var appearingItem = e.Item;
+            var lastItem = itemsSource.LastOrDefault();
 
-            var maxScrollY = this.listView.RowHeight * itemsSourceCount - this.listView.Height;
-
-            if (e.ScrollY >= maxScrollY * 0.85)
+            if (appearingItem.Equals(lastItem))
             {
                 this.isLoading = true;
 
